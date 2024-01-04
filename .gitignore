@@ -1,1 +1,7 @@
 app_config.json
+
+# Build files
+/build
+/dist
+/spec
+*.spec
