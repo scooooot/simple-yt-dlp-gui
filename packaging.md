@@ -13,23 +13,27 @@ To package this up:
 pyinstaller ./source/yt-dlp_gui.py -F --name="simple-yt-dlp-gui" --workpath="./build" --distpath="./dist" --specpath="./spec" --icon="../icon/simple-yt-dlp-gui.ico"
 
 # Copy README
-copy-item -path "B:/github_repos/simple-yt-dlp-gui/README.md" -destination "B:/github_repos/simple-yt-dlp-gui/dist"
+copy-item -path "./README.md" -destination "./dist"
 ```
 <br>
 
 ## Linux
 ```bash
-pyinstaller
+# Compile package
+pyinstaller ./source/yt-dlp_gui.py -F --name="simple-yt-dlp-gui" --workpath="./build" --distpath="./dist" --specpath="./spec"
+
+# Copy README
+cp ./README.md ./dist
 ```
 
-<br>
+<br><br>
 
-| Arg           | Explanation                                       |
-|---------------|---------------------------------------------------|
-| yt-dlp_gui.py | Script to package/compile                         |
-| -F            | Indicates we want a single binary as output       |
-| name          | Specify the name of the binary                    |
-| workpath      | Directory where temporary build files will go     |
-| distpath      | Directory the binary will be saved                |
-| specpath      | Directory where the generated spec files go       |
-| icon          | Filepath for icon that will be embedded in binary |
+| Arg           | Explanation                                       | Notes                  |
+|---------------|---------------------------------------------------|------------------------|
+| yt-dlp_gui.py | Script to package/compile                         |                        |
+| -F            | Indicates we want a single binary as output       |                        |
+| name          | Specify the name of the binary                    |                        |
+| workpath      | Directory where temporary build files will go     |                        |
+| distpath      | Directory the binary will be saved                |                        |
+| specpath      | Directory where the generated spec files go       |                        |
+| icon          | Filepath for icon that will be embedded in binary | Not supported on Linux |

@@ -1,11 +1,16 @@
 # Setup
 
-Launch the simple-yt-dlp-gui executable. If this is your first time running, it should ask where you have ffmpeg installed. Point it to the bin folder inside your ffmpeg installation.
+Launch the simple-yt-dlp-gui executable. If this is your first time running, it should ask where you have ffmpeg installed. Point it to the your ffmpeg executable. 
+- On Windows, this will be inside the "bin" folder wherever you installed ffmpeg
+- On Linux it's probably stored at /bin/ffmpeg
 
 This directory will be saved inside **app_config.json** in the same directory as the simple-yt-dlp-gui executable. If anything weird happens, you can always enter the filepath manually, like this:
 
 ``` json
-{"ffmpeg_directory": "D:/ffmpeg/bin"}
+{"ffmpeg_directory": "D:/ffmpeg/bin/ffmpeg.exe"}
+```
+``` json
+{"ffmpeg_directory": "/bin/ffmpeg"}
 ```
 
 Use forward slashes in your filepath. If you absolutely must use backslashes, then do double backslashes like this:
