@@ -52,3 +52,4 @@ Here's a brief overview of the available options:
 - Add a separate tab to set/update your ffmpeg directory
 - Add the ability to set a default download directory instead of asking every time
 - Improve preferred quality selection logic
+- Address cross-platform theming (dark theme only works for Windows currently)
