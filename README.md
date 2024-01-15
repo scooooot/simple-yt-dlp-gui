@@ -40,15 +40,16 @@ Here's a brief overview of the available options:
 | Thumbnail | No thumbnails | No thumbnails will be downloaded |
 | Thumbnail | Embedded thumbnails | Thumbnails will be downloaded and embedded inside the media file |
 | Thumbnail | Standalone thumbnails | Thumbnails will be downloaded and stored as a separate file alongside the media file. You can specify the format of the thumbnail with the dropdown menu |
+| General | Use Cookies from Browser | If checked, it will attempt to grab your existing cookies from the selected browser. Use this option if downloading YouTube membership content (assuming you've paid for it, obviously) | 
 | Video | Convert Video | If checked, it will attempt to convert your video to the format selected in the dropdown box |
-| Video | Preferred quality | Selecting a specific resolution (like 1080p) will cause yt-dlp to try and grab a 1080p version. If unavailable, it will grab the next best quality option |
+| Video | Preferred quality | Selecting best will give you the best video & best audio merged together. Selecting a specific resolution (like 1080p) will cause yt-dlp to try and grab a 1080p version. If unavailable, it will grab the next best quality option |
 | Audio | Keep audio only | If checked, then only the audio will be downloaded. You can optionally select a desired format for the output  |
 | Audio | Bitrate in kbps | You can specify your desired bitrate. For mp3, either VBR (0, 1, 2, etc) or CBR (128, 192, 320, etc) values are accepted |
 
 <br><br>
 
 # Future Features & TODOs
-- Add a console output window inside of the UI to monitor progress of the downloads
+- ~~Add a console output window inside of the UI to monitor progress of the downloads~~ too hard lol
 - Add a separate tab to set/update your ffmpeg directory
 - Add the ability to set a default download directory instead of asking every time
 - Improve preferred quality selection logic
