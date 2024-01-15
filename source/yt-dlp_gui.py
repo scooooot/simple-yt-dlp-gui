@@ -86,6 +86,7 @@ class MainWindow(QWidget):
         self.cookies_check_box = QCheckBox("Use Cookies from Browser")
         self.cookies_browser_dropdown = QComboBox()
 
+        # Would prefer a list maintained by yt-dlp, similar to ffmpeg codecs
         self.cookies_browser_dropdown.addItems(
             ["", "brave", "chrome", "chromium", "edge", "firefox", "opera", "safari", "vivaldi"]
         )
