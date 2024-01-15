@@ -48,7 +48,7 @@ Here's a brief overview of the available options:
 <br><br>
 
 # Future Features & TODOs
-- Add a console output window inside of the UI to monitor progress of the downloads
+- ~~Add a console output window inside of the UI to monitor progress of the downloads~~ too hard lol
 - Add a separate tab to set/update your ffmpeg directory
 - Add the ability to set a default download directory instead of asking every time
 - Improve preferred quality selection logic
