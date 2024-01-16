@@ -344,14 +344,14 @@ class MainWindow(QWidget):
                 "Please select your ffmpeg executable"
             )
             ffmpeg_popup.exec()
-        self.set_ffmpeg_directory(trigger_popup=True, clear_config=False)
+        self.set_ffmpeg_directory()
         
         # Set output directory
         if "output_directory" not in self.app_config:
             output_directory_popup = QMessageBox()
             output_directory_popup.setText("Please set an output directory")
             output_directory_popup.exec()
-        self.set_output_directory(trigger_popup=True, clear_config=False)
+        self.set_output_directory()
 
         self.parse_urls()
 
