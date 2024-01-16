@@ -24,7 +24,7 @@ from PyQt6.QtWidgets import (
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import MEDIA_EXTENSIONS
 
-DEBUG = False
+DEBUG = True
 
 
 class MainWindow(QWidget):
@@ -48,10 +48,43 @@ class MainWindow(QWidget):
         except FileNotFoundError:
             print("Config file not found. Generating...")
             self.app_config = {}
-            self.save_app_config()
+            self.save_app_config_file()
 
-        # Check for ffmpeg installation
-        self.ffmpeg_directory = self.set_ffmpeg_directory()
+
+        # General options widgets
+        self.general_options_box = (QGroupBox("General Options"))
+        self.cookies_check_box = QCheckBox("Use browser cookies")
+        self.cookies_browser_dropdown = QComboBox()
+        self.output_directory_button = QPushButton("output directory", clicked=self.click_output_directory_button)
+        self.output_directory_display = QLineEdit()
+        self.ffmpeg_directory_button = QPushButton("ffmpeg directory", clicked=self.click_ffmpeg_directory_button)
+        self.ffmpeg_directory_display = QLineEdit()
+
+        # Would prefer a list maintained by yt-dlp, similar to ffmpeg codecs
+        self.cookies_browser_dropdown.addItems(
+            ["", "brave", "chrome", "chromium", "edge", "firefox", "opera", "safari", "vivaldi"]
+        )
+        self.cookies_check_box.setToolTip(
+            "Use cookies from your browser. Useful for retrieving membership-gated content on YouTube."
+        )
+        self.output_directory_display.setReadOnly(True)
+        self.ffmpeg_directory_display.setReadOnly(True)
+        if "ffmpeg_directory" in self.app_config:
+            self.ffmpeg_directory_display.setText(self.app_config["ffmpeg_directory"])
+        if "output_directory" in self.app_config:
+            self.output_directory_display.setText(self.app_config["output_directory"])
+
+        # QGridLayout: (widget, row, col, row_span, col_span, alignment)
+        general_options_box_layout = QGridLayout()
+        general_options_box_layout.addWidget(self.cookies_check_box, 0, 0)
+        general_options_box_layout.addWidget(self.cookies_browser_dropdown, 0, 1)
+        general_options_box_layout.addWidget(self.output_directory_button, 1, 0)
+        general_options_box_layout.addWidget(self.output_directory_display, 1, 1)
+        general_options_box_layout.addWidget(self.ffmpeg_directory_button, 2, 0)
+        general_options_box_layout.addWidget(self.ffmpeg_directory_display, 2, 1)
+        general_options_box_layout.addItem(QSpacerItem(0, 0), 0, 2, 0, 5)
+        self.general_options_box.setLayout(general_options_box_layout)
+
 
         # Thumbnail option widgets
         self.thumbnail_radio_box = QGroupBox("Thumbnail Options")
@@ -79,29 +112,8 @@ class MainWindow(QWidget):
         radio_box_layout.addWidget(self.thumbnail_none_radio, 0, 0)
         radio_box_layout.addWidget(self.thumbnail_embed_radio, 1, 0)
         radio_box_layout.addWidget(self.thumbnail_standalone_radio, 2, 0)
-        radio_box_layout.addWidget(self.thumbnail_format_dropdown, 2, 1)
+        radio_box_layout.addWidget(self.thumbnail_format_dropdown, 2, 1, alignment=Qt.AlignmentFlag(0x0001))
         self.thumbnail_radio_box.setLayout(radio_box_layout)
-
-
-        # General options widgets
-        self.general_options_box = (QGroupBox("General Options"))
-        self.cookies_check_box = QCheckBox("Use browser cookies")
-        self.cookies_browser_dropdown = QComboBox()
-
-        # Would prefer a list maintained by yt-dlp, similar to ffmpeg codecs
-        self.cookies_browser_dropdown.addItems(
-            ["", "brave", "chrome", "chromium", "edge", "firefox", "opera", "safari", "vivaldi"]
-        )
-        self.cookies_check_box.setToolTip(
-            "Use cookies from your browser. Useful for retrieving membership-gated content on YouTube."
-        )
-
-        # QGridLayout: (widget, row, col, row_span, col_span, alignment)
-        general_options_box_layout = QGridLayout()
-        general_options_box_layout.addWidget(self.cookies_check_box, 0, 0, alignment = Qt.AlignmentFlag(0x0001))
-        general_options_box_layout.addWidget(self.cookies_browser_dropdown, 0, 1, alignment = Qt.AlignmentFlag(0x0001))
-        general_options_box_layout.addItem(QSpacerItem(0, 0), 0, 2, 0, 5)
-        self.general_options_box.setLayout(general_options_box_layout)
 
 
         # Video option widgets
@@ -121,10 +133,10 @@ class MainWindow(QWidget):
         )
 
         video_box_layout = QGridLayout()
-        video_box_layout.addWidget(self.video_quality_label, 0, 0, alignment = Qt.AlignmentFlag(0x0001))
-        video_box_layout.addWidget(self.video_quality_dropdown, 0, 1, alignment = Qt.AlignmentFlag(0x0001))
-        video_box_layout.addWidget(self.video_convert_checkbox, 1, 0, alignment = Qt.AlignmentFlag(0x0001))
-        video_box_layout.addWidget(self.video_format_dropdown, 1, 1, alignment = Qt.AlignmentFlag(0x0001))
+        video_box_layout.addWidget(self.video_quality_label, 0, 0)
+        video_box_layout.addWidget(self.video_quality_dropdown, 0, 1, alignment=Qt.AlignmentFlag(0x0001))
+        video_box_layout.addWidget(self.video_convert_checkbox, 1, 0)
+        video_box_layout.addWidget(self.video_format_dropdown, 1, 1, alignment=Qt.AlignmentFlag(0x0001))
         video_box_layout.addItem(QSpacerItem(0, 0), 0, 2, 2, 5)
         self.video_options_box.setLayout(video_box_layout)
 
@@ -142,10 +154,10 @@ class MainWindow(QWidget):
         self.strip_audio_checkbox.setToolTip("Saves only the audio, deletes the video")
 
         audio_box_layout = QGridLayout()
-        audio_box_layout.addWidget(self.strip_audio_checkbox, 0, 0, alignment = Qt.AlignmentFlag(0x0001))
-        audio_box_layout.addWidget(self.audio_format_dropdown, 0, 1, alignment = Qt.AlignmentFlag(0x0001))
-        audio_box_layout.addWidget(self.audio_bitrate_checkbox, 1, 0, alignment = Qt.AlignmentFlag(0x0001))
-        audio_box_layout.addWidget(self.audio_bitrate_input, 1, 1, alignment = Qt.AlignmentFlag(0x0001))
+        audio_box_layout.addWidget(self.strip_audio_checkbox, 0, 0)
+        audio_box_layout.addWidget(self.audio_format_dropdown, 0, 1, alignment=Qt.AlignmentFlag(0x0001))
+        audio_box_layout.addWidget(self.audio_bitrate_checkbox, 1, 0)
+        audio_box_layout.addWidget(self.audio_bitrate_input, 1, 1, alignment=Qt.AlignmentFlag(0x0001))
         audio_box_layout.addItem(QSpacerItem(0, 0), 0, 2, 2, 5)
 
         self.audio_options_box.setLayout(audio_box_layout)
@@ -199,38 +211,57 @@ class MainWindow(QWidget):
         self.set_output_directory()
         self.create_ytdlp_config()
 
+
+    def click_ffmpeg_directory_button(self):
+        if "ffmpeg_directory" in self.app_config:
+            del self.app_config["ffmpeg_directory"]
+        
+        self.set_ffmpeg_directory()
+        self.ffmpeg_directory_display.setText(self.app_config["ffmpeg_directory"])
+    
+    def click_output_directory_button(self):
+        if "output_directory" in self.app_config:
+            del self.app_config["output_directory"]
+        
+        self.set_output_directory()
+        self.output_directory_display.setText(self.app_config["output_directory"])
+
     def set_ffmpeg_directory(self):
         if "ffmpeg_directory" not in self.app_config:
-            self.pop_up_box = QMessageBox()
-            self.pop_up_box.setText(
-                "Please select your ffmpeg executable"
-            )
-            self.pop_up_box.exec()
-
             ffmpeg_directory = QFileDialog.getExistingDirectory()
             self.app_config["ffmpeg_directory"] = ffmpeg_directory
-            self.save_app_config()
+            self.save_app_config_file()
         else:
-            ffmpeg_directory = self.app_config["ffmpeg_directory"]
+            print("ffmpeg directory set!")
 
-        return ffmpeg_directory
+        if DEBUG:
+            self.output_check_text.appendPlainText(
+                f"ffmpeg directory - {self.app_config['ffmpeg_directory']}"
+            )
 
-    def save_app_config(self):
+
+    def set_output_directory(self):
+        if "output_directory" not in self.app_config:
+            output_directory = QFileDialog.getExistingDirectory()
+            self.app_config["output_directory"] = output_directory
+            self.save_app_config_file()
+        else:
+            print("output directory set!")
+        
+        if DEBUG:
+            self.output_check_text.appendPlainText(
+                f"Output directory - {self.app_config['output_directory']}"
+            )
+
+    def save_app_config_file(self):
         with open(self.app_config_path, "w") as file:
             json.dump(self.app_config, file)
 
-    def set_output_directory(self):
-        self.output_directory = QFileDialog.getExistingDirectory()
-        if DEBUG:
-            self.output_check_text.appendPlainText(
-                f"Output directory - {self.output_directory}"
-            )
-
     def create_ytdlp_config(self):
         config = {
-            "paths": {"home": self.output_directory},
+            "paths": {"home": self.app_config["output_directory"]},
             "writethumbnail": True,
-            "ffmpeg_location": self.ffmpeg_directory,
+            "ffmpeg_location": self.app_config["ffmpeg_directory"],
             "postprocessors": [],
         }
 
@@ -280,7 +311,7 @@ class MainWindow(QWidget):
             config["postprocessors"].append({"key": "EmbedThumbnail"})
 
         if self.thumbnail_standalone_radio.isChecked():
-            config["ffmpeg_location"] = self.ffmpeg_directory
+            config["ffmpeg_location"] = self.app_config["ffmpeg_directory"]
             config["postprocessors"].append(
                 {
                     "key": "FFmpegThumbnailsConvertor",
@@ -304,9 +335,23 @@ class MainWindow(QWidget):
         if DEBUG:
             self.output_check_text.appendPlainText(f"{self.urls}")
 
+    
     def download(self):
-        # Have user select an output directory
-        self.set_output_directory()
+        # Set ffmpeg directory
+        if "ffmpeg_directory" not in self.app_config:
+            ffmpeg_popup = QMessageBox()
+            ffmpeg_popup.setText(
+                "Please select your ffmpeg executable"
+            )
+            ffmpeg_popup.exec()
+        self.set_ffmpeg_directory(trigger_popup=True, clear_config=False)
+        
+        # Set output directory
+        if "output_directory" not in self.app_config:
+            output_directory_popup = QMessageBox()
+            output_directory_popup.setText("Please set an output directory")
+            output_directory_popup.exec()
+        self.set_output_directory(trigger_popup=True, clear_config=False)
 
         self.parse_urls()
 
