@@ -1,6 +1,7 @@
 import json
 import sys
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QApplication,
     QButtonGroup,
@@ -16,6 +17,7 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QRadioButton,
     QSpacerItem,
+    QTabWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -83,7 +85,7 @@ class MainWindow(QWidget):
 
         # General options widgets
         self.general_options_box = (QGroupBox("General Options"))
-        self.cookies_check_box = QCheckBox("Use Cookies from Browser")
+        self.cookies_check_box = QCheckBox("Use browser cookies")
         self.cookies_browser_dropdown = QComboBox()
 
         # Would prefer a list maintained by yt-dlp, similar to ffmpeg codecs
@@ -94,9 +96,11 @@ class MainWindow(QWidget):
             "Use cookies from your browser. Useful for retrieving membership-gated content on YouTube."
         )
 
+        # QGridLayout: (widget, row, col, row_span, col_span, alignment)
         general_options_box_layout = QGridLayout()
-        general_options_box_layout.addWidget(self.cookies_check_box, 0, 0)
-        general_options_box_layout.addWidget(self.cookies_browser_dropdown, 0, 1)
+        general_options_box_layout.addWidget(self.cookies_check_box, 0, 0, alignment = Qt.AlignmentFlag(0x0001))
+        general_options_box_layout.addWidget(self.cookies_browser_dropdown, 0, 1, alignment = Qt.AlignmentFlag(0x0001))
+        general_options_box_layout.addItem(QSpacerItem(0, 0), 0, 2, 0, 5)
         self.general_options_box.setLayout(general_options_box_layout)
 
 
@@ -117,10 +121,11 @@ class MainWindow(QWidget):
         )
 
         video_box_layout = QGridLayout()
-        video_box_layout.addWidget(self.video_convert_checkbox, 0, 0)
-        video_box_layout.addWidget(self.video_format_dropdown, 0, 1)
-        video_box_layout.addWidget(self.video_quality_label, 1, 0)
-        video_box_layout.addWidget(self.video_quality_dropdown, 1, 1)
+        video_box_layout.addWidget(self.video_quality_label, 0, 0, alignment = Qt.AlignmentFlag(0x0001))
+        video_box_layout.addWidget(self.video_quality_dropdown, 0, 1, alignment = Qt.AlignmentFlag(0x0001))
+        video_box_layout.addWidget(self.video_convert_checkbox, 1, 0, alignment = Qt.AlignmentFlag(0x0001))
+        video_box_layout.addWidget(self.video_format_dropdown, 1, 1, alignment = Qt.AlignmentFlag(0x0001))
+        video_box_layout.addItem(QSpacerItem(0, 0), 0, 2, 2, 5)
         self.video_options_box.setLayout(video_box_layout)
 
 
@@ -137,10 +142,12 @@ class MainWindow(QWidget):
         self.strip_audio_checkbox.setToolTip("Saves only the audio, deletes the video")
 
         audio_box_layout = QGridLayout()
-        audio_box_layout.addWidget(self.strip_audio_checkbox, 0, 0)
-        audio_box_layout.addWidget(self.audio_format_dropdown, 0, 1)
-        audio_box_layout.addWidget(self.audio_bitrate_checkbox, 1, 0)
-        audio_box_layout.addWidget(self.audio_bitrate_input, 1, 1)
+        audio_box_layout.addWidget(self.strip_audio_checkbox, 0, 0, alignment = Qt.AlignmentFlag(0x0001))
+        audio_box_layout.addWidget(self.audio_format_dropdown, 0, 1, alignment = Qt.AlignmentFlag(0x0001))
+        audio_box_layout.addWidget(self.audio_bitrate_checkbox, 1, 0, alignment = Qt.AlignmentFlag(0x0001))
+        audio_box_layout.addWidget(self.audio_bitrate_input, 1, 1, alignment = Qt.AlignmentFlag(0x0001))
+        audio_box_layout.addItem(QSpacerItem(0, 0), 0, 2, 2, 5)
+
         self.audio_options_box.setLayout(audio_box_layout)
 
 
@@ -159,19 +166,18 @@ class MainWindow(QWidget):
         self.output_check_text.setReadOnly(True)
 
 
-        # (widget, row, col, row_span, col_span, alignment)
-        all_options_layout = QGridLayout()  
-        all_options_layout.setColumnMinimumWidth(1, 15) # Add blank space
-        all_options_layout.setRowMinimumHeight(4, 15)
-        all_options_layout.addWidget(self.thumbnail_radio_box, 0, 0, 4, 1)
-        all_options_layout.addWidget(self.general_options_box, 0, 2, 4, 1)
-        all_options_layout.addWidget(self.video_options_box, 5, 0, 4, 1)
-        all_options_layout.addWidget(self.audio_options_box, 5, 2, 4, 1)
+        # Assemble tab bar
+        self.settings_tab_bar = QTabWidget()
+        self.settings_tab_bar.addTab(self.general_options_box, "General")
+        self.settings_tab_bar.addTab(self.thumbnail_radio_box, "Thumbnail")
+        self.settings_tab_bar.addTab(self.video_options_box, "Video")
+        self.settings_tab_bar.addTab(self.audio_options_box, "Audio")
+
 
         # Widgets - assemble main window
         main_layout.addWidget(self.url_input_label)
         main_layout.addWidget(self.url_input)
-        main_layout.addLayout(all_options_layout)
+        main_layout.addWidget(self.settings_tab_bar)
         main_layout.addItem(QSpacerItem(default_width, 60))
         main_layout.addWidget(self.confirm_button)
 
