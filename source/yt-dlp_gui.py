@@ -217,36 +217,31 @@ class MainWindow(QWidget):
             del self.app_config["ffmpeg_directory"]
         
         self.set_ffmpeg_directory()
-        self.ffmpeg_directory_display.setText(self.app_config["ffmpeg_directory"])
     
     def click_output_directory_button(self):
         if "output_directory" in self.app_config:
             del self.app_config["output_directory"]
         
         self.set_output_directory()
-        self.output_directory_display.setText(self.app_config["output_directory"])
 
     def set_ffmpeg_directory(self):
-        if "ffmpeg_directory" not in self.app_config:
-            ffmpeg_directory = QFileDialog.getExistingDirectory()
-            self.app_config["ffmpeg_directory"] = ffmpeg_directory
-            self.save_app_config_file()
-        else:
-            print("ffmpeg directory set!")
+        ffmpeg_directory = QFileDialog.getExistingDirectory()
+        self.app_config["ffmpeg_directory"] = ffmpeg_directory
+        self.save_app_config_file()
+        
+        self.ffmpeg_directory_display.setText(self.app_config["ffmpeg_directory"])
 
         if DEBUG:
             self.output_check_text.appendPlainText(
                 f"ffmpeg directory - {self.app_config['ffmpeg_directory']}"
             )
 
-
     def set_output_directory(self):
-        if "output_directory" not in self.app_config:
-            output_directory = QFileDialog.getExistingDirectory()
-            self.app_config["output_directory"] = output_directory
-            self.save_app_config_file()
-        else:
-            print("output directory set!")
+        output_directory = QFileDialog.getExistingDirectory()
+        self.app_config["output_directory"] = output_directory
+        self.save_app_config_file()
+
+        self.output_directory_display.setText(self.app_config["output_directory"])
         
         if DEBUG:
             self.output_check_text.appendPlainText(
@@ -341,17 +336,17 @@ class MainWindow(QWidget):
         if "ffmpeg_directory" not in self.app_config:
             ffmpeg_popup = QMessageBox()
             ffmpeg_popup.setText(
-                "Please select your ffmpeg executable"
+                "Please select the directory containing your ffmpeg executable"
             )
             ffmpeg_popup.exec()
-        self.set_ffmpeg_directory()
+            self.set_ffmpeg_directory()
         
         # Set output directory
         if "output_directory" not in self.app_config:
             output_directory_popup = QMessageBox()
             output_directory_popup.setText("Please set an output directory")
             output_directory_popup.exec()
-        self.set_output_directory()
+            self.set_output_directory()
 
         self.parse_urls()
 
